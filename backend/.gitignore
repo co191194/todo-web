@@ -1,0 +1,19 @@
+# Dependencies
+/target/
+Cargo.lock
+
+# Environment
+.env
+*.pem
+
+# IDE
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# SQLx
+.sqlx/

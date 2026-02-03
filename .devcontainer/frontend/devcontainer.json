@@ -1,0 +1,34 @@
+{
+  "name": "ToDo Web App - Frontend",
+  "dockerComposeFile": "../../compose.yaml",
+  "service": "frontend",
+  "workspaceFolder": "/workspace",
+  "shutdownAction": "stopCompose",
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "dbaeumer.vscode-eslint",
+        "esbenp.prettier-vscode",
+        "bradlc.vscode-tailwindcss",
+        "formulahendry.auto-rename-tag",
+        "usernamehw.errorlens",
+        "ms-azuretools.vscode-docker"
+      ],
+      "settings": {
+        "[typescript]": {
+          "editor.defaultFormatter": "esbenp.prettier-vscode",
+          "editor.formatOnSave": true
+        },
+        "[typescriptreact]": {
+          "editor.defaultFormatter": "esbenp.prettier-vscode",
+          "editor.formatOnSave": true
+        },
+        "[json]": {
+          "editor.defaultFormatter": "esbenp.prettier-vscode",
+          "editor.formatOnSave": true
+        }
+      }
+    }
+  },
+  "postCreateCommand": "cd /workspace/frontend && pnpm install"
+}

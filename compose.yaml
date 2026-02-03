@@ -1,0 +1,56 @@
+services:
+  backend:
+    build:
+      context: .
+      dockerfile: backend/Dockerfile
+      target: dev
+    ports:
+      - "3000:3000"
+    volumes:
+      - .:/workspace
+      - backend_target:/workspace/backend/target
+    environment:
+      - DATABASE_URL=postgres://postgres:postgres@db:5432/todo_db
+      - RUST_LOG=debug
+      - RUST_BACKTRACE=1
+    depends_on:
+      db:
+        condition: service_healthy
+    command: ["wait-for-it.sh", "db:5432", "--", "cargo", "watch", "-x", "run"]
+
+  frontend:
+    build:
+      context: .
+      dockerfile: frontend/Dockerfile
+      target: dev
+    ports:
+      - "3001:3000"
+    volumes:
+      - .:/workspace
+      - frontend_node_modules:/workspace/frontend/node_modules
+    environment:
+      - NEXT_PUBLIC_API_URL=http://localhost:3000
+    depends_on:
+      - backend
+    command: ["sh", "-c", "pnpm install --config.confirmModulesPurge=false && pnpm dev"]
+
+  db:
+    image: postgres:17
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=todo_db
+    volumes:
+      - db_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  db_data:
+  backend_target:
+  frontend_node_modules:
