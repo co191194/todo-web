@@ -20,13 +20,16 @@ pub enum AppError {
 
     #[error("Not found: {0}")]
     NotFound(String),
+    
+    #[error("Conflict: {0}")]
+    Conflict(String),
 
     #[error("Internal server error: {0}")]
     Internal(String),
 }
 
-#[derive(Serialize)]
-struct ErrorResponse {
+#[derive(Serialize, utoipa::ToSchema)]
+pub struct ErrorResponse {
     error: String,
     message: String,
 }
@@ -45,6 +48,7 @@ impl IntoResponse for AppError {
             AppError::Auth(msg) => (StatusCode::UNAUTHORIZED, "auth_error", msg.clone()),
             AppError::Validation(msg) => (StatusCode::BAD_REQUEST, "validation_error", msg.clone()),
             AppError::NotFound(msg) => (StatusCode::NOT_FOUND, "not_found", msg.clone()),
+            AppError::Conflict(msg) => (StatusCode::CONFLICT, "conflict", msg.clone()),
             AppError::Internal(msg) => {
                 tracing::error!("Internal error: {}", msg);
                 (

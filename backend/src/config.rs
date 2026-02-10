@@ -5,16 +5,18 @@ use std::env;
 #[derive(Debug, Clone)]
 pub struct Config {
     pub database_url: String,
-    pub jwt_secret: String,
-    pub jwt_access_expires_in: i64,  // minutes
-    pub jwt_refresh_expires_in: i64, // days
+    pub jwt_private_key_path: String, // RS256秘密鍵ファイルパス
+    pub jwt_public_key_path: String,  // RS256公開鍵ファイルパス
+    pub jwt_access_expires_in: i64,   // minutes
+    pub jwt_refresh_expires_in: i64,  // days
 }
 
 impl Config {
     pub fn from_env() -> Result<Self, env::VarError> {
         Ok(Self {
             database_url: env::var("DATABASE_URL")?,
-            jwt_secret: env::var("JWT_SECRET").unwrap_or_else(|_| "dev-secret-key".to_string()),
+            jwt_private_key_path: env::var("JWT_PRIVATE_KEY_PATH")?,
+            jwt_public_key_path: env::var("JWT_PUBLIC_KEY_PATH")?,
             jwt_access_expires_in: env::var("JWT_ACCESS_EXPIRES_IN")
                 .unwrap_or_else(|_| "15".to_string())
                 .parse()
