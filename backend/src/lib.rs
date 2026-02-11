@@ -13,21 +13,24 @@ pub mod services;
 
 use jsonwebtoken::DecodingKey;
 use services::auth_service::AuthService;
-
-use crate::services::auth_service;
+use services::todo_service::TodoService;
 
 #[derive(Clone)]
 pub struct AppState {
     pub auth_service: AuthService,
+    pub todo_service: TodoService,
     pub decoding_key: DecodingKey,
 }
 
 /// テスト・統合テスト用：AppStateを構築する
 pub fn build_app_state(pool: sqlx::PgPool, config: config::Config) -> AppState {
     let user_repo = repositories::user_repository::UserRepository::new(pool.clone());
-    let token_repo = repositories::token_repository::TokenRepository::new(pool);
+    let token_repo = repositories::token_repository::TokenRepository::new(pool.clone());
+    let todo_repo = repositories::todo_repository::TodoRepository::new(pool);
+
     let auth_service = AuthService::new(user_repo, token_repo, config.clone())
         .expect("Failed to init AuthService");
+    let todo_service = TodoService::new(todo_repo);
 
     let public_key_data =
         std::fs::read(&config.jwt_public_key_path).expect("Failed to read public key");
@@ -35,6 +38,7 @@ pub fn build_app_state(pool: sqlx::PgPool, config: config::Config) -> AppState {
 
     AppState {
         auth_service,
+        todo_service,
         decoding_key,
     }
 }
@@ -56,6 +60,7 @@ pub fn build_router(state: AppState) -> axum::Router {
             get(|| async { axum::Json(serde_json::json!({"status": "ok"})) }),
         )
         .nest("/api/auth", routes::auth_routes(state.clone()))
+        .nest("/api/todos", routes::todo_routes(state.clone()))
         .with_state(state)
         .layer(cors)
 }

@@ -11,10 +11,13 @@ use tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt};
 
 use crate::config::Config;
 use crate::models::auth::{AuthResponse, LoginRequest, RegisterRequest, UserResponse};
+use crate::models::todo::{CreateTodoRequest, TodoListResponse, TodoPriority, TodoResponse, TodoStatus, UpdateTodoRequest, UpdateTodoStatusRequest};
+use crate::repositories::todo_repository::TodoRepository;
 use crate::repositories::token_repository::TokenRepository;
 use crate::repositories::user_repository::UserRepository;
 use crate::services::auth_service::AuthService;
 use crate::error::ErrorResponse;
+use crate::services::todo_service::TodoService;
 
 mod config;
 mod error;
@@ -28,6 +31,7 @@ mod services;
 #[derive(Clone)]
 pub struct AppState {
     pub auth_service: AuthService,
+    pub todo_service: TodoService,
     pub decoding_key: DecodingKey,
 }
 
@@ -52,6 +56,12 @@ async fn health_check() -> Json<HealthResponse> {
         handlers::auth::refresh,
         handlers::auth::logout,
         handlers::auth::me,
+        handlers::todo::list,
+        handlers::todo::create,
+        handlers::todo::get_by_id,
+        handlers::todo::update,
+        handlers::todo::delete,
+        handlers::todo::update_status,
     ),
     components(schemas(
         RegisterRequest,
@@ -59,10 +69,18 @@ async fn health_check() -> Json<HealthResponse> {
         AuthResponse,
         UserResponse,
         ErrorResponse,
+        CreateTodoRequest,
+        UpdateTodoRequest,
+        UpdateTodoStatusRequest,
+        TodoResponse,
+        TodoListResponse,
+        TodoStatus,
+        TodoPriority,
     )),
     modifiers(&SecurityAddon),
     tags(
-        (name = "auth", description = "Authentication API")
+        (name = "auth", description = "Authentication API"),
+        (name = "todos", description = "ToDo CRUD API")
     )
 )]
 struct ApiDoc;
@@ -120,8 +138,10 @@ async fn main() {
     // Build AppState
     let user_repo = UserRepository::new(pool.clone());
     let token_repo = TokenRepository::new(pool.clone());
+    let todo_repo = TodoRepository::new(pool.clone());
     let auth_service =
         AuthService::new(user_repo, token_repo, config.clone()).expect("Failed to initialize AuthService");
+    let todo_service = TodoService::new(todo_repo);
 
     // 公開鍵の読み込み（JWTの検証用）
     let public_key_data =
@@ -129,6 +149,7 @@ async fn main() {
     let decoding_key = DecodingKey::from_rsa_pem(&public_key_data).expect("Invalid public key");
     let state = AppState {
         auth_service,
+        todo_service,
         decoding_key,
     };
 
@@ -143,6 +164,7 @@ async fn main() {
         .merge(SwaggerUi::new("/swagger-ui").url("/api-docs/openapi.json", ApiDoc::openapi()))
         .route("/health", get(health_check))
         .nest("/api/auth", routes::auth_routes(state.clone()))
+        .nest("/api/todos", routes::todo_routes(state.clone()))
         .with_state(state)
         .layer(TraceLayer::new_for_http())
         .layer(cors);

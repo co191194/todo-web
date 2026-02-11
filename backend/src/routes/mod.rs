@@ -2,11 +2,15 @@
 
 use axum::{
     middleware,
-    routing::{get, post},
+    routing::{get, patch, post},
     Router,
 };
 
-use crate::{handlers::auth, middleware::auth::require_auth, AppState};
+use crate::{
+    handlers::{auth, todo},
+    middleware::auth::require_auth,
+    AppState,
+};
 
 pub fn auth_routes(state: AppState) -> Router<AppState> {
     let public = Router::new()
@@ -20,4 +24,15 @@ pub fn auth_routes(state: AppState) -> Router<AppState> {
         .layer(middleware::from_fn_with_state(state, require_auth));
 
     public.merge(protected)
+}
+
+pub fn todo_routes(state: AppState) -> Router<AppState> {
+    Router::new()
+        .route("/", get(todo::list).post(todo::create))
+        .route(
+            "/{id}",
+            get(todo::get_by_id).put(todo::update).delete(todo::delete),
+        )
+        .route("/{id}/status", patch(todo::update_status))
+        .layer(middleware::from_fn_with_state(state, require_auth))
 }
