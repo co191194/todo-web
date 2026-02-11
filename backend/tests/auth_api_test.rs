@@ -17,6 +17,10 @@ use helper::{post_json, response_json, test_config};
 const URI_AUTH_REGISTER: &str = "/api/auth/register";
 const URI_AUTH_LOGIN: &str = "/api/auth/login";
 
+const PROP_ACCESS_TOKEN: &str = "accessToken";
+const PROP_TOKEN_TYPE: &str = "tokenType";
+const PROP_EXPIRES_IN: &str = "expiresIn";
+
 #[sqlx::test]
 async fn test_register_success(pool: PgPool) {
     let config = test_config();
@@ -140,9 +144,9 @@ async fn test_login_success(pool: PgPool) {
     assert!(cookie_str.contains("refresh_token="));
 
     let json = response_json(response.into_body()).await;
-    assert!(json["access_token"].is_string());
-    assert_eq!(json["token_type"], "Bearer");
-    assert_eq!(json["expires_in"], 900);
+    assert!(json[PROP_ACCESS_TOKEN].is_string());
+    assert_eq!(json[PROP_TOKEN_TYPE], "Bearer");
+    assert_eq!(json[PROP_EXPIRES_IN], 900);
 }
 
 #[sqlx::test]
@@ -247,7 +251,7 @@ async fn test_me_with_valid_token(pool: PgPool) {
         .unwrap();
 
     let login_json = response_json(login_resp.into_body()).await;
-    let access_token = login_json["access_token"].as_str().unwrap();
+    let access_token = login_json[PROP_ACCESS_TOKEN].as_str().unwrap();
 
     // /me にアクセス
     let request = Request::builder()

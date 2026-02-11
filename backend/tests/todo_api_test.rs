@@ -23,7 +23,7 @@ const PROP_ID: &str = "id";
 const PROP_TOTAL: &str = "total";
 const PROP_ITEMS: &str = "items";
 const PROP_PAGE: &str = "page";
-const PROP_PER_PAGE: &str = "per_page";
+const PROP_PER_PAGE: &str = "perPage";
 
 #[sqlx::test]
 async fn test_create_todo(pool: PgPool) {

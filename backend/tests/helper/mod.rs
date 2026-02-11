@@ -78,6 +78,6 @@ pub async fn register_and_login_user(app: axum::Router, email: &str) -> (axum::R
         .unwrap();
 
     let body = response_json(resp.into_body()).await;
-    let token = body["access_token"].as_str().unwrap().to_string();
+    let token = body["accessToken"].as_str().unwrap().to_string();
     (app, token)
 }

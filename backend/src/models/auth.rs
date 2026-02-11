@@ -3,6 +3,7 @@ use uuid::Uuid;
 use validator::Validate;
 
 #[derive(Debug, Deserialize, Validate, utoipa::ToSchema)]
+#[serde(rename_all = "camelCase")]
 pub struct RegisterRequest {
     #[validate(email)]
     pub email: String,
@@ -11,6 +12,7 @@ pub struct RegisterRequest {
 }
 
 #[derive(Debug, Deserialize, Validate, utoipa::ToSchema)]
+#[serde(rename_all = "camelCase")]
 pub struct LoginRequest {
     #[validate(email)]
     pub email: String,
@@ -18,6 +20,7 @@ pub struct LoginRequest {
 }
 
 #[derive(Debug, Serialize, utoipa::ToSchema)]
+#[serde(rename_all = "camelCase")]
 pub struct AuthResponse {
     pub access_token: String,
     pub token_type: String,
@@ -25,6 +28,7 @@ pub struct AuthResponse {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
 pub struct Claims {
     pub sub: Uuid,
     pub email: String,
@@ -33,6 +37,7 @@ pub struct Claims {
 }
 
 #[derive(Debug, Serialize, utoipa::ToSchema)]
+#[serde(rename_all = "camelCase")]
 pub struct UserResponse {
     pub id: uuid::Uuid,
     pub email: String,

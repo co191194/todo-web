@@ -9,7 +9,7 @@ use validator::Validate;
 
 #[derive(Debug, Clone, Serialize, Deserialize, sqlx::Type, ToSchema, PartialEq)]
 #[sqlx(type_name = "todo_status", rename_all = "snake_case")]
-#[serde(rename_all = "snake_case")]
+#[serde(rename_all = "camelCase")]
 pub enum TodoStatus {
     Pending,
     InProgress,
@@ -18,7 +18,7 @@ pub enum TodoStatus {
 
 #[derive(Debug, Clone, Serialize, Deserialize, sqlx::Type, ToSchema, PartialEq)]
 #[sqlx(type_name = "todo_priority", rename_all = "snake_case")]
-#[serde(rename_all = "snake_case")]
+#[serde(rename_all = "camelCase")]
 pub enum TodoPriority {
     Low,
     Medium,
@@ -43,6 +43,7 @@ pub struct Todo {
 // Request DTOs
 
 #[derive(Debug, Deserialize, Validate, ToSchema)]
+#[serde(rename_all="camelCase")]
 pub struct CreateTodoRequest {
     #[validate(length(
         min = 1,
@@ -57,6 +58,7 @@ pub struct CreateTodoRequest {
 }
 
 #[derive(Debug, Deserialize, Validate, ToSchema)]
+#[serde(rename_all = "camelCase")]
 pub struct UpdateTodoRequest {
     #[validate(length(
         min = 1,
@@ -71,6 +73,7 @@ pub struct UpdateTodoRequest {
 }
 
 #[derive(Debug, Deserialize, Validate, ToSchema)]
+#[serde(rename_all = "camelCase")]
 pub struct UpdateTodoStatusRequest {
     pub status: TodoStatus,
 }
@@ -78,6 +81,7 @@ pub struct UpdateTodoStatusRequest {
 // Query DTO
 
 #[derive(Debug, Deserialize, ToSchema)]
+#[serde(rename_all = "camelCase")]
 pub struct TodoQuery {
     pub status: Option<TodoStatus>,
     pub priority: Option<TodoPriority>,
@@ -109,6 +113,7 @@ fn default_per_page() -> i64 {
 // Response DTO
 
 #[derive(Debug, Serialize, ToSchema)]
+#[serde(rename_all = "camelCase")]
 pub struct TodoResponse {
     pub id: Uuid,
     pub title: String,
@@ -136,6 +141,7 @@ impl From<Todo> for TodoResponse {
 }
 
 #[derive(Debug, Serialize, ToSchema)]
+#[serde(rename_all = "camelCase")]
 pub struct TodoListResponse {
     pub items:Vec<TodoResponse>,
     pub total: i64,
