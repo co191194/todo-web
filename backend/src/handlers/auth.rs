@@ -35,7 +35,7 @@ pub async fn register(
     let body = serde_json::json!({
         "id": user.id,
         "email": user.email,
-        "created_at": user.created_at,
+        "createdAt": user.created_at,
     });
     
     Ok((StatusCode::CREATED, Json(body)))
