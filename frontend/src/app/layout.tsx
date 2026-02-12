@@ -1,11 +1,12 @@
-import type { Metadata } from "next";
-import { Theme } from "@radix-ui/themes";
-import "@radix-ui/themes/styles.css";
-import "./globals.css";
+import type { Metadata } from 'next';
+import { Theme } from '@radix-ui/themes';
+import { AuthProvider } from '@/contexts/AuthContext';
+import '@radix-ui/themes/styles.css';
+import './globals.css';
 
 export const metadata: Metadata = {
-  title: "ToDo App",
-  description: "A simple ToDo management application",
+  title: 'ToDo App',
+  description: 'A simple ToDo management application',
 };
 
 export default function RootLayout({
@@ -17,7 +18,7 @@ export default function RootLayout({
     <html lang="ja">
       <body>
         <Theme accentColor="blue" grayColor="slate" radius="medium">
-          {children}
+          <AuthProvider>{children}</AuthProvider>
         </Theme>
       </body>
     </html>
