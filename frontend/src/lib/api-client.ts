@@ -3,7 +3,7 @@ import { AuthResponse } from '@/types/auth';
 import axios, { AxiosError, InternalAxiosRequestConfig } from 'axios';
 
 const apiClient = axios.create({
-  baseURL: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000',
+  baseURL: '',
   withCredentials: true, // Cookie 自動送信
   headers: {
     'Content-Type': 'application/json',
