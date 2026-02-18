@@ -4,6 +4,9 @@
 FROM node:22-slim AS base
 WORKDIR /workspace/frontend
 
+ENV PNPM_HOME="/pnpm"
+ENV PATH="$PNPM_HOME:$PATH"
+
 # Enable corepack for pnpm
 RUN corepack enable && corepack prepare pnpm@latest --activate
 
