@@ -10,7 +10,7 @@ pub struct RefreshToken {
     #[serde(skip_serializing)]
     pub token_hash: String,
     #[serde(skip_serializing)]
-    device_info: String,
+    device_info: Option<String>,
     pub created_at: DateTime<Utc>,
 }
 
