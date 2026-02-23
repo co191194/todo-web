@@ -1,26 +1,235 @@
-import { Container, Heading, Text, Box } from '@radix-ui/themes';
+'use client';
+
+import Header from '@/components/Header';
+import TodoDeleteDialog from '@/components/TodoDeleteDialog';
+import TodoFilters from '@/components/TodoFilters';
+import TodoFormDialog from '@/components/TodoFormDialog';
+import TodoItem from '@/components/TodoItem';
+import API_URI from '@/constants/api-uri';
+import { getMessage, Message } from '@/constants/message';
+import { useAuth } from '@/contexts/AuthContext';
+import apiClient from '@/lib/api-client';
+import { TodoFormValues } from '@/schemas/todo';
+import {
+  TodoSortValues,
+  TodoPriority,
+  TodoStatus,
+  OrderValues,
+  Todo,
+  TodoListResponse,
+  CreateTodoRequest,
+  UpdateTodoRequest,
+  UpdateTodoStatusRequest,
+} from '@/types/todo';
+import { Container, Text, Box, Flex, Button } from '@radix-ui/themes';
+import { useCallback, useEffect, useState } from 'react';
 
 export default function Home() {
-  return (
-    <Container size="2" py="9">
-      <Box mb="6">
-        <Heading size="8" mb="2">
-          ToDo App
-        </Heading>
-        <Text color="gray" size="4">
-          シンプルなToDo管理アプリケーション
-        </Text>
-      </Box>
+  const { isLoading } = useAuth();
 
-      <Box
-        p="4"
-        style={{
-          backgroundColor: 'var(--gray-2)',
-          borderRadius: 'var(--radius-3)',
-        }}
-      >
-        <Text>✅ フロントエンドが正常に起動しています</Text>
-      </Box>
-    </Container>
+  // フィルタ・ソート
+  const [status, setStatus] = useState<TodoStatus | '*'>('*');
+  const [priority, setPriority] = useState<TodoPriority | '*'>('*');
+  const [sort, setSort] = useState<TodoSortValues>('createdAt');
+  const [order, setOrder] = useState<OrderValues>('desc');
+  const [page, setPage] = useState(1);
+
+  // データ
+  const [todos, setTodos] = useState<Todo[]>([]);
+  const [total, setTotal] = useState(0);
+  const [perPage] = useState(20);
+
+  // ダイアログ
+  const [formOpen, setFormOpen] = useState(false);
+  const [deleteOpen, setDeleteOpen] = useState(false);
+  const [editingTodo, setEditingTodo] = useState<Todo | null>(null);
+  const [deletingTodo, setDeletingTodo] = useState<Todo | null>(null);
+
+  // 一覧取得
+  const fetchTodos = useCallback(async () => {
+    const params: Record<string, string | number> = {
+      sort,
+      order,
+      page,
+      perPage,
+    };
+    if (status !== '*') params.status = status;
+    if (priority !== '*') params.priority = priority;
+
+    try {
+      const { data } = await apiClient.get<TodoListResponse>(API_URI.TODOS, {
+        params,
+      });
+      setTodos(data.items);
+      setTotal(data.total);
+    } catch (error) {
+      // TODO: ユーザ向けにエラーメッセージをトースト表示する
+      console.error('システムエラーが発生しました。', error)
+    }
+  }, [status, priority, sort, order, page, perPage]);
+
+  useEffect(() => {
+    if (!isLoading) {
+      fetchTodos();
+    }
+  }, [isLoading, fetchTodos]);
+
+  // 作成
+  const handleCreate = async (values: TodoFormValues) => {
+    await apiClient.post(API_URI.TODOS, {
+      title: values.title,
+      description: values.description || null,
+      dueDate: values.dueDate || null,
+      priority: values.priority,
+    } as CreateTodoRequest);
+    await fetchTodos();
+  };
+
+  // 更新
+  const handleUpdate = async (values: TodoFormValues) => {
+    if (!editingTodo) return;
+    await apiClient.put(API_URI.TODO_BY_ID(editingTodo.id), {
+      title: values.title,
+      description: values.description || null,
+      dueDate: values.dueDate || null,
+      status: values.status,
+      priority: values.priority,
+    } as UpdateTodoRequest);
+    setEditingTodo(null);
+    await fetchTodos();
+  };
+
+  // 削除
+  const handleDelete = async () => {
+    if (!deletingTodo) return;
+    await apiClient.delete(API_URI.TODO_BY_ID(deletingTodo.id));
+    setDeletingTodo(null);
+    await fetchTodos();
+  };
+
+  // ステータス変更
+  const handleStatusChange = async (id: string, newStatus: TodoStatus) => {
+    await apiClient.patch(API_URI.TODO_STATUS(id), {
+      status: newStatus,
+    } as UpdateTodoStatusRequest);
+    await fetchTodos();
+  };
+
+  // フィルタイベント
+  const handleFilterStatusChange = (value: TodoStatus | '*') => {
+    setStatus(value);
+    setPage(1);
+  };
+  const handleFilterPriorityChange = (value: TodoPriority | '*') => {
+    setPriority(value);
+    setPage(1);
+  };
+  const handleFilterSortChange = (value: TodoSortValues) => {
+    setSort(value);
+    setPage(1);
+  };
+  const handleFilterOrderChange = (value: OrderValues) => {
+    setOrder(value);
+    setPage(1);
+  };
+
+  // イベント
+  const openCreate = () => {
+    setEditingTodo(null);
+    setFormOpen(true);
+  };
+  const openEdit = (todo: Todo) => {
+    setEditingTodo(todo);
+    setFormOpen(true);
+  };
+  const openDelete = (todo: Todo) => {
+    setDeletingTodo(todo);
+    setDeleteOpen(true);
+  };
+
+  const totalPages = Math.ceil(total / perPage);
+
+  if (isLoading) {
+    return (
+      <Container size="3" py="9">
+        <Text>読み込み中...</Text>
+      </Container>
+    );
+  }
+
+  return (
+    <>
+      <Header />
+      <Container size="3" py="6">
+        <TodoFilters
+          status={status}
+          priority={priority}
+          sort={sort}
+          order={order}
+          onStatusChange={handleFilterStatusChange}
+          onPriorityChange={handleFilterPriorityChange}
+          onSortChange={handleFilterSortChange}
+          onOrderChange={handleFilterOrderChange}
+          onCreateClick={openCreate}
+        />
+
+        {todos.length === 0 ? (
+          <Box py="9">
+            <Text align="center" color="gray" size="3">
+              {getMessage(Message.I0009)}
+            </Text>
+          </Box>
+        ) : (
+          <>
+            {todos.map((todo) => (
+              <TodoItem
+                key={todo.id}
+                todo={todo}
+                onEdit={openEdit}
+                onDelete={openDelete}
+                onStatusChange={handleStatusChange}
+              />
+            ))}
+
+            {/* ページネーション */}
+            {totalPages > 1 && (
+              <Flex justify="center" gap="2" mt="4">
+                <Button
+                  variant="soft"
+                  disabled={page <= 1}
+                  onClick={() => setPage((p) => p - 1)}
+                >
+                  前頁
+                </Button>
+                <Text size="2" style={{ lineHeight: '32px' }}>
+                  {page} / {totalPages}
+                </Text>
+                <Button
+                  variant="soft"
+                  disabled={page >= totalPages}
+                  onClick={() => setPage((p) => p + 1)}
+                >
+                  次頁
+                </Button>
+              </Flex>
+            )}
+          </>
+        )}
+
+        <TodoFormDialog
+          open={formOpen}
+          onOpenChange={setFormOpen}
+          onSubmit={editingTodo ? handleUpdate : handleCreate}
+          todo={editingTodo}
+        />
+
+        <TodoDeleteDialog
+          open={deleteOpen}
+          onOpenChange={setDeleteOpen}
+          onConfirm={handleDelete}
+          todoTitle={deletingTodo?.title || ''}
+        />
+      </Container>
+    </>
   );
 }

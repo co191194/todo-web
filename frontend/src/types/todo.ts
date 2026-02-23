@@ -1,5 +1,7 @@
 export type TodoStatus = 'pending' | 'inProgress' | 'completed';
 export type TodoPriority = 'low' | 'medium' | 'high';
+export type TodoSortValues = 'createdAt' | 'dueDate' | 'priority';
+export type OrderValues = 'asc' | 'desc';
 
 // ToDo取得レスポンス
 export interface Todo {

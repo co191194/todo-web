@@ -16,18 +16,21 @@ export const Message = {
   E0003: '{0}が一致しません。',
   E0004: '{0}または{1}が正しくありません。',
   E0005: '{0}に失敗しました。しばらく経ってからお試しください。',
-  E0006: 'この{0}は既に登録されています。'
+  E0006: 'この{0}は既に登録されています。',
+  E0007: '{0}は{1}文字以内で入力してください。',
+  I0008: '「{0}」を削除しますか？この操作は取り消せません。',
+  I0009: 'ToDoがありません。「新規作成」から追加してください。',
 } as const satisfies Record<string, string>;
 
 /**
  * メッセージを作成します。
- * 
+ *
  * @param message メッセージ
  * @param args 埋め込む値
- * @returns 
+ * @returns
  */
 export function getMessage(
-  message: typeof Message[keyof typeof Message],
+  message: (typeof Message)[keyof typeof Message],
   ...args: string[]
 ): string {
   return message.replace(/\{(\d+)\}/g, (match, number) => {
