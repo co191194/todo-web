@@ -8,6 +8,7 @@ import TodoItem from '@/components/TodoItem';
 import API_URI from '@/constants/api-uri';
 import { getMessage, Message } from '@/constants/message';
 import { useAuth } from '@/contexts/AuthContext';
+import { useToast } from '@/contexts/ToastContext';
 import apiClient from '@/lib/api-client';
 import { TodoFormValues } from '@/schemas/todo';
 import {
@@ -26,6 +27,7 @@ import { useCallback, useEffect, useState } from 'react';
 
 export default function Home() {
   const { isLoading } = useAuth();
+  const { showToast } = useToast();
 
   // フィルタ・ソート
   const [status, setStatus] = useState<TodoStatus | '*'>('*');
@@ -62,11 +64,13 @@ export default function Home() {
       });
       setTodos(data.items);
       setTotal(data.total);
-    } catch (error) {
-      // TODO: ユーザ向けにエラーメッセージをトースト表示する
-      console.error('システムエラーが発生しました。', error)
+    } catch {
+      showToast({
+        type: 'error',
+        title: getMessage(Message.E0005, 'データ取得'),
+      });
     }
-  }, [status, priority, sort, order, page, perPage]);
+  }, [status, priority, sort, order, page, perPage, showToast]);
 
   useEffect(() => {
     if (!isLoading) {
@@ -76,43 +80,74 @@ export default function Home() {
 
   // 作成
   const handleCreate = async (values: TodoFormValues) => {
-    await apiClient.post(API_URI.TODOS, {
-      title: values.title,
-      description: values.description || null,
-      dueDate: values.dueDate || null,
-      priority: values.priority,
-    } as CreateTodoRequest);
-    await fetchTodos();
+    try {
+      await apiClient.post(API_URI.TODOS, {
+        title: values.title,
+        description: values.description || null,
+        dueDate: values.dueDate || null,
+        priority: values.priority,
+      } as CreateTodoRequest);
+      await fetchTodos();
+      showToast({ type: 'success', title: getMessage(Message.I0010, 'ToDo') });
+    } catch {
+      showToast({
+        type: 'error',
+        title: getMessage(Message.E0005, 'ToDo作成'),
+      });
+    }
   };
 
   // 更新
   const handleUpdate = async (values: TodoFormValues) => {
     if (!editingTodo) return;
-    await apiClient.put(API_URI.TODO_BY_ID(editingTodo.id), {
-      title: values.title,
-      description: values.description || null,
-      dueDate: values.dueDate || null,
-      status: values.status,
-      priority: values.priority,
-    } as UpdateTodoRequest);
-    setEditingTodo(null);
-    await fetchTodos();
+    try {
+      await apiClient.put(API_URI.TODO_BY_ID(editingTodo.id), {
+        title: values.title,
+        description: values.description || null,
+        dueDate: values.dueDate || null,
+        status: values.status,
+        priority: values.priority,
+      } as UpdateTodoRequest);
+      setEditingTodo(null);
+      await fetchTodos();
+      showToast({ type: 'success', title: getMessage(Message.I0011, 'ToDo') });
+    } catch {
+      showToast({
+        type: 'error',
+        title: getMessage(Message.E0005, 'ToDo更新'),
+      });
+    }
   };
 
   // 削除
   const handleDelete = async () => {
     if (!deletingTodo) return;
-    await apiClient.delete(API_URI.TODO_BY_ID(deletingTodo.id));
-    setDeletingTodo(null);
-    await fetchTodos();
+    try {
+      await apiClient.delete(API_URI.TODO_BY_ID(deletingTodo.id));
+      setDeletingTodo(null);
+      await fetchTodos();
+      showToast({ type: 'success', title: getMessage(Message.I0012, 'ToDo') });
+    } catch {
+      showToast({
+        type: 'error',
+        title: getMessage(Message.E0005, 'ToDo削除'),
+      });
+    }
   };
 
   // ステータス変更
   const handleStatusChange = async (id: string, newStatus: TodoStatus) => {
-    await apiClient.patch(API_URI.TODO_STATUS(id), {
-      status: newStatus,
-    } as UpdateTodoStatusRequest);
-    await fetchTodos();
+    try {
+      await apiClient.patch(API_URI.TODO_STATUS(id), {
+        status: newStatus,
+      } as UpdateTodoStatusRequest);
+      await fetchTodos();
+    } catch {
+      showToast({
+        type: 'error',
+        title: getMessage(Message.E0005, 'ステータス変更'),
+      });
+    }
   };
 
   // フィルタイベント

@@ -3,6 +3,7 @@ import { Theme } from '@radix-ui/themes';
 import { AuthProvider } from '@/contexts/AuthContext';
 import '@radix-ui/themes/styles.css';
 import './globals.css';
+import { ToastProvider } from '@/contexts/ToastContext';
 
 export const metadata: Metadata = {
   title: 'ToDo App',
@@ -18,7 +19,9 @@ export default function RootLayout({
     <html lang="ja">
       <body>
         <Theme accentColor="blue" grayColor="slate" radius="medium">
-          <AuthProvider>{children}</AuthProvider>
+          <AuthProvider>
+            <ToastProvider>{children}</ToastProvider>
+          </AuthProvider>
         </Theme>
       </body>
     </html>
