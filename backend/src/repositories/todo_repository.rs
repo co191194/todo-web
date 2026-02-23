@@ -90,8 +90,9 @@ impl TodoRepository {
 
         // ソート
         let sort_column = match query.sort.as_str() {
-            "due_date" => "due_date",
+            "due_date" | "dueDate" => "due_date",
             "priority" => "priority",
+            "created_at" | "createdAt" => "created_at",
             _ => "created_at",
         };
         let sort_order = match query.order.as_str() {
