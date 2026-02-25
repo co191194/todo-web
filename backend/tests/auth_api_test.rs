@@ -21,6 +21,7 @@ const PROP_ACCESS_TOKEN: &str = "accessToken";
 const PROP_TOKEN_TYPE: &str = "tokenType";
 const PROP_EXPIRES_IN: &str = "expiresIn";
 
+// 正常なメールアドレスとパスワードでユーザー登録が成功することを確認する
 #[sqlx::test]
 async fn test_register_success(pool: PgPool) {
     let config = test_config();
@@ -44,6 +45,7 @@ async fn test_register_success(pool: PgPool) {
     assert!(json["id"].is_string());
 }
 
+// 同じメールアドレスで2回登録すると、2回目が409 Conflictになることを確認する
 #[sqlx::test]
 async fn test_register_duplicate_email(pool: PgPool) {
     let config = test_config();
@@ -72,6 +74,7 @@ async fn test_register_duplicate_email(pool: PgPool) {
     assert_eq!(response.status(), StatusCode::CONFLICT);
 }
 
+// 不正なメールアドレス形式で登録すると400 Bad Requestになることを確認する
 #[sqlx::test]
 async fn test_register_invalid_email(pool: PgPool) {
     let config = test_config();
@@ -90,6 +93,7 @@ async fn test_register_invalid_email(pool: PgPool) {
     assert_eq!(response.status(), StatusCode::BAD_REQUEST);
 }
 
+// パスワードが短すぎる場合に400 Bad Requestになることを確認する
 #[sqlx::test]
 async fn test_register_short_password(pool: PgPool) {
     let config = test_config();
@@ -108,6 +112,7 @@ async fn test_register_short_password(pool: PgPool) {
     assert_eq!(response.status(), StatusCode::BAD_REQUEST);
 }
 
+// 登録済みユーザーで正しい認証情報を使いログインが成功し、アクセストークンとリフレッシュトークン（Cookie）が返却されることを確認する
 #[sqlx::test]
 async fn test_login_success(pool: PgPool) {
     let config = test_config();
@@ -149,6 +154,7 @@ async fn test_login_success(pool: PgPool) {
     assert_eq!(json[PROP_EXPIRES_IN], 900);
 }
 
+// 登録済みユーザーに対して誤ったパスワードでログインすると401 Unauthorizedになることを確認する
 #[sqlx::test]
 async fn test_login_wrong_password(pool: PgPool) {
     let config = test_config();
@@ -183,6 +189,7 @@ async fn test_login_wrong_password(pool: PgPool) {
     assert_eq!(response.status(), StatusCode::UNAUTHORIZED);
 }
 
+// 存在しないユーザーでログインすると401 Unauthorizedになることを確認する
 #[sqlx::test]
 async fn test_login_nonexistent_user(pool: PgPool) {
     let config = test_config();
@@ -203,6 +210,7 @@ async fn test_login_nonexistent_user(pool: PgPool) {
     assert_eq!(response.status(), StatusCode::UNAUTHORIZED);
 }
 
+// アクセストークンなしで /api/auth/me にアクセスすると401 Unauthorizedになることを確認する
 #[sqlx::test]
 async fn test_me_without_token(pool: PgPool) {
     let config = test_config();
@@ -219,6 +227,7 @@ async fn test_me_without_token(pool: PgPool) {
     assert_eq!(response.status(), StatusCode::UNAUTHORIZED);
 }
 
+// 有効なアクセストークンを付与して /api/auth/me にアクセスすると、ログインユーザーの情報が取得できることを確認する
 #[sqlx::test]
 async fn test_me_with_valid_token(pool: PgPool) {
     let config = test_config();

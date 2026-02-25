@@ -25,6 +25,7 @@ const PROP_ITEMS: &str = "items";
 const PROP_PAGE: &str = "page";
 const PROP_PER_PAGE: &str = "perPage";
 
+// ToDoを正常に作成できることを確認する
 #[sqlx::test]
 async fn test_create_todo(pool: PgPool) {
     let state = build_app_state(pool, test_config());
@@ -55,6 +56,7 @@ async fn test_create_todo(pool: PgPool) {
     assert!(json[PROP_ID].is_string());
 }
 
+// タイトルが空の場合、バリデーションエラー(400)が返ることを確認する
 #[sqlx::test]
 async fn test_create_todo_validation_error(pool: PgPool) {
     let state = build_app_state(pool, test_config());
@@ -71,6 +73,7 @@ async fn test_create_todo_validation_error(pool: PgPool) {
     assert_eq!(resp.status(), StatusCode::BAD_REQUEST);
 }
 
+// 認証なしでToDo作成を試みた場合、401 Unauthorizedが返ることを確認する
 #[sqlx::test]
 async fn test_create_todo_unauthorized(pool: PgPool) {
     let state = build_app_state(pool, test_config());
@@ -88,6 +91,7 @@ async fn test_create_todo_unauthorized(pool: PgPool) {
     assert_eq!(resp.status(), StatusCode::UNAUTHORIZED);
 }
 
+// ToDo一覧を取得し、件数・ページネーション情報が正しいことを確認する
 #[sqlx::test]
 async fn test_list_todos(pool: PgPool) {
     let state = build_app_state(pool, test_config());
@@ -118,6 +122,7 @@ async fn test_list_todos(pool: PgPool) {
     assert_eq!(json[PROP_PER_PAGE], 20);
 }
 
+// ステータスでフィルタリングしたToDo一覧が正しく取得できることを確認する
 #[sqlx::test]
 async fn test_list_todos_with_filter(pool: PgPool) {
     let state = build_app_state(pool, test_config());
@@ -163,6 +168,7 @@ async fn test_list_todos_with_filter(pool: PgPool) {
     assert_eq!(json[PROP_ITEMS][0][PROP_TITLE], "Pending todo");
 }
 
+// IDを指定してToDoの詳細を取得できることを確認する
 #[sqlx::test]
 async fn test_get_todo_by_id(pool: PgPool) {
     let state = build_app_state(pool, test_config());
@@ -199,6 +205,7 @@ async fn test_get_todo_by_id(pool: PgPool) {
     assert_eq!(json[PROP_TITLE], TITLE);
 }
 
+// 存在しないIDでToDoを取得した場合、404 Not Foundが返ることを確認する
 #[sqlx::test]
 async fn test_get_todo_not_found(pool: PgPool) {
     let state = build_app_state(pool, test_config());
@@ -219,6 +226,7 @@ async fn test_get_todo_not_found(pool: PgPool) {
     assert_eq!(resp.status(), StatusCode::NOT_FOUND);
 }
 
+// ToDoのタイトルと優先度を更新できることを確認する
 #[sqlx::test]
 async fn test_update_todo(pool: PgPool) {
     let state = build_app_state(pool, test_config());
@@ -262,6 +270,7 @@ async fn test_update_todo(pool: PgPool) {
     assert_eq!(json[PROP_PRIORITY], EXPECTED_PRIORITY);
 }
 
+// ToDoのステータスをPATCHで変更できることを確認する
 #[sqlx::test]
 async fn test_update_todo_status(pool: PgPool) {
     let state = build_app_state(pool, test_config());
@@ -299,6 +308,7 @@ async fn test_update_todo_status(pool: PgPool) {
     assert_eq!(json[PROP_STATUS], EXPECTED_STATUS);
 }
 
+// ToDoを削除し、削除後に取得すると404が返ることを確認する
 #[sqlx::test]
 async fn test_delete_todo(pool: PgPool) {
     let state = build_app_state(pool, test_config());
@@ -345,6 +355,7 @@ async fn test_delete_todo(pool: PgPool) {
     assert_eq!(resp.status(), StatusCode::NOT_FOUND);
 }
 
+// 他のユーザーのToDoにはアクセス（取得・削除）できないことを確認する
 #[sqlx::test]
 async fn test_cannot_access_other_user_todo(pool: PgPool) {
     let state = build_app_state(pool, test_config());
