@@ -73,7 +73,7 @@ export default function TodoFormDialog({
 
   return (
     <Dialog.Root open={open} onOpenChange={onOpenChange}>
-      <Dialog.Content maxWidth="480px">
+      <Dialog.Content style={{ maxWidth: 'min(480px, 90vw)' }}>
         <Dialog.Title>{isEdit ? 'ToDo編集' : 'ToDo作成'}</Dialog.Title>
         <form onSubmit={handleSubmit(handleFormSubmit)}>
           <Flex direction="column" gap="3" mt="3">
@@ -103,7 +103,7 @@ export default function TodoFormDialog({
               <TextField.Root type="datetime-local" {...register('dueDate')} />
             </Box>
 
-            <Flex gap="3">
+            <Flex gap="3" direction={{ initial: 'column', xs: 'row' }}>
               <Box style={{ flex: 1 }}>
                 <Text as="label" size="2" weight="medium">
                   優先度

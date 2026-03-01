@@ -18,9 +18,11 @@ export default function Header() {
         <Flex justify="between" align="center">
           <Heading size="4">ToDo App</Heading>
           <Flex align="center" gap="3">
-            <Text size="2" color="gray">
-              {user?.email}
-            </Text>
+            <Box display={{ initial: 'none', sm: 'block' }}>
+              <Text size="2" color="gray">
+                {user?.email}
+              </Text>
+            </Box>
             <Button variant="soft" size="1" onClick={logout}>
               ログアウト
             </Button>

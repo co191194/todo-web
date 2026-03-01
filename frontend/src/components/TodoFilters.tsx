@@ -39,13 +39,13 @@ export default function TodoFilters({
         </Text>
         <Button onClick={onCreateClick}>新規作成</Button>
       </Flex>
-      <Flex gap="3" wrap="wrap">
-        <Box>
+      <Flex gap="3" wrap="wrap" direction={{ initial: 'column', xs: 'row' }}>
+        <Box style={{ flex: '1 1 40%', minWidth: 0 }}>
           <Text as="label" size="1" color="gray">
             ステータス
           </Text>
           <Select.Root value={status} onValueChange={onStatusChange}>
-            <Select.Trigger placeholder="すべて" />
+            <Select.Trigger placeholder="すべて" style={{ width: '100%' }} />
             <Select.Content>
               <Select.Item value="*">すべて</Select.Item>
               <Select.Item value="pending">未着手</Select.Item>
@@ -54,12 +54,12 @@ export default function TodoFilters({
             </Select.Content>
           </Select.Root>
         </Box>
-        <Box>
+        <Box style={{ flex: '1 1 40%', minWidth: 0 }}>
           <Text as="label" size="1" color="gray">
             優先度
           </Text>
           <Select.Root value={priority} onValueChange={onPriorityChange}>
-            <Select.Trigger placeholder="すべて" />
+            <Select.Trigger placeholder="すべて" style={{ width: '100%' }} />
             <Select.Content>
               <Select.Item value="*">すべて</Select.Item>
               <Select.Item value="low">低</Select.Item>
@@ -68,12 +68,12 @@ export default function TodoFilters({
             </Select.Content>
           </Select.Root>
         </Box>
-        <Box>
+        <Box style={{ flex: '1 1 40%', minWidth: 0 }}>
           <Text as="label" size="1" color="gray">
             ソート
           </Text>
           <Select.Root value={sort} onValueChange={onSortChange}>
-            <Select.Trigger />
+            <Select.Trigger style={{ width: '100%' }} />
             <Select.Content>
               <Select.Item value="createdAt">作成日</Select.Item>
               <Select.Item value="dueDate">期限日</Select.Item>
@@ -81,12 +81,12 @@ export default function TodoFilters({
             </Select.Content>
           </Select.Root>
         </Box>
-        <Box>
+        <Box style={{ flex: '1 1 40%', minWidth: 0 }}>
           <Text as="label" size="1" color="gray">
             順序
           </Text>
           <Select.Root value={order} onValueChange={onOrderChange}>
-            <Select.Trigger />
+            <Select.Trigger style={{ width: '100%' }} />
             <Select.Content>
               <Select.Item value="desc">降順</Select.Item>
               <Select.Item value="asc">昇順</Select.Item>

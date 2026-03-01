@@ -36,7 +36,12 @@ export default function TodoItem({
 }: TodoItemProps) {
   return (
     <Card mb="2">
-      <Flex justify="between" align="start" gap="3">
+      <Flex
+        justify="between"
+        align={{ initial: 'stretch', sm: 'start' }}
+        direction={{ initial: 'column', sm: 'row' }}
+        gap="3"
+      >
         <Box style={{ flex: 1 }}>
           <Flex align="center" gap="2" mb="1">
             <Text weight="bold" size="3">
@@ -62,7 +67,12 @@ export default function TodoItem({
             </Text>
           </Flex>
         </Box>
-        <Flex direction="column" gap="2" align="end">
+        <Flex
+          direction={{ initial: 'row', sm: 'column' }}
+          gap="2"
+          align={{ initial: 'center', sm: 'end' }}
+          justify={{ initial: 'between', sm: 'start' }}
+        >
           <Select.Root
             value={todo.status}
             onValueChange={(value) =>

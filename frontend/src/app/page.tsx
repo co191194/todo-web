@@ -231,6 +231,7 @@ export default function Home() {
               <Flex justify="center" gap="2" mt="4">
                 <Button
                   variant="soft"
+                  size={{ initial: '1', sm: '2' }}
                   disabled={page <= 1}
                   onClick={() => setPage((p) => p - 1)}
                 >
@@ -241,6 +242,7 @@ export default function Home() {
                 </Text>
                 <Button
                   variant="soft"
+                  size={{ initial: '1', sm: '2' }}
                   disabled={page >= totalPages}
                   onClick={() => setPage((p) => p + 1)}
                 >
