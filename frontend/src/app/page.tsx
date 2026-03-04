@@ -193,80 +193,94 @@ export default function Home() {
   }
 
   return (
-    <>
+    <Flex direction="column" style={{ height: '100vh', overflow: 'hidden' }}>
       <Header />
-      <Container size="3" py="6">
-        <TodoFilters
-          status={status}
-          priority={priority}
-          sort={sort}
-          order={order}
-          onStatusChange={handleFilterStatusChange}
-          onPriorityChange={handleFilterPriorityChange}
-          onSortChange={handleFilterSortChange}
-          onOrderChange={handleFilterOrderChange}
-          onCreateClick={openCreate}
-        />
+      <Box style={{ flex: 1, overflow: 'hidden', width: '100%' }}>
+        <Flex
+          direction="column"
+          mx="auto"
+          px="4"
+          py="6"
+          style={{
+            maxWidth: 'var(--container-3)',
+            height: '100%',
+            overflow: 'hidden',
+          }}
+        >
+          <TodoFilters
+            status={status}
+            priority={priority}
+            sort={sort}
+            order={order}
+            onStatusChange={handleFilterStatusChange}
+            onPriorityChange={handleFilterPriorityChange}
+            onSortChange={handleFilterSortChange}
+            onOrderChange={handleFilterOrderChange}
+            onCreateClick={openCreate}
+          />
 
-        {todos.length === 0 ? (
-          <Box py="9">
-            <Text align="center" color="gray" size="3">
-              {getMessage(Message.I0009)}
-            </Text>
-          </Box>
-        ) : (
-          <>
-            {todos.map((todo) => (
-              <TodoItem
-                key={todo.id}
-                todo={todo}
-                onEdit={openEdit}
-                onDelete={openDelete}
-                onStatusChange={handleStatusChange}
-              />
-            ))}
+          {todos.length === 0 ? (
+            <Box py="9">
+              <Text align="center" color="gray" size="3">
+                {getMessage(Message.I0009)}
+              </Text>
+            </Box>
+          ) : (
+            <>
+              <Box pr="2" style={{ flex: 1, overflowY: 'auto'}}>
+                {todos.map((todo) => (
+                  <TodoItem
+                    key={todo.id}
+                    todo={todo}
+                    onEdit={openEdit}
+                    onDelete={openDelete}
+                    onStatusChange={handleStatusChange}
+                  />
+                ))}
+              </Box>
 
-            {/* ページネーション */}
-            {totalPages > 1 && (
-              <Flex justify="center" gap="2" mt="4">
-                <Button
-                  variant="soft"
-                  size={{ initial: '1', sm: '2' }}
-                  disabled={page <= 1}
-                  onClick={() => setPage((p) => p - 1)}
-                >
-                  前頁
-                </Button>
-                <Text size="2" style={{ lineHeight: '32px' }}>
-                  {page} / {totalPages}
-                </Text>
-                <Button
-                  variant="soft"
-                  size={{ initial: '1', sm: '2' }}
-                  disabled={page >= totalPages}
-                  onClick={() => setPage((p) => p + 1)}
-                >
-                  次頁
-                </Button>
-              </Flex>
-            )}
-          </>
-        )}
+              {/* ページネーション */}
+              {totalPages > 1 && (
+                <Flex justify="center" gap="2" mt="4">
+                  <Button
+                    variant="soft"
+                    size={{ initial: '1', sm: '2' }}
+                    disabled={page <= 1}
+                    onClick={() => setPage((p) => p - 1)}
+                  >
+                    前頁
+                  </Button>
+                  <Text size="2" style={{ lineHeight: '32px' }}>
+                    {page} / {totalPages}
+                  </Text>
+                  <Button
+                    variant="soft"
+                    size={{ initial: '1', sm: '2' }}
+                    disabled={page >= totalPages}
+                    onClick={() => setPage((p) => p + 1)}
+                  >
+                    次頁
+                  </Button>
+                </Flex>
+              )}
+            </>
+          )}
 
-        <TodoFormDialog
-          open={formOpen}
-          onOpenChange={setFormOpen}
-          onSubmit={editingTodo ? handleUpdate : handleCreate}
-          todo={editingTodo}
-        />
+          <TodoFormDialog
+            open={formOpen}
+            onOpenChange={setFormOpen}
+            onSubmit={editingTodo ? handleUpdate : handleCreate}
+            todo={editingTodo}
+          />
 
-        <TodoDeleteDialog
-          open={deleteOpen}
-          onOpenChange={setDeleteOpen}
-          onConfirm={handleDelete}
-          todoTitle={deletingTodo?.title || ''}
-        />
-      </Container>
-    </>
+          <TodoDeleteDialog
+            open={deleteOpen}
+            onOpenChange={setDeleteOpen}
+            onConfirm={handleDelete}
+            todoTitle={deletingTodo?.title || ''}
+          />
+        </Flex>
+      </Box>
+    </Flex>
   );
 }
