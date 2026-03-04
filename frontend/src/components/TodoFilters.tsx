@@ -39,9 +39,9 @@ export default function TodoFilters({
         </Text>
         <Button onClick={onCreateClick}>新規作成</Button>
       </Flex>
-      <Flex gap="3" wrap="wrap" direction={{ initial: 'column', xs: 'row' }}>
-        <Box style={{ flex: '1 1 40%', minWidth: 0 }}>
-          <Text as="label" size="1" color="gray">
+      <Flex gap="3" wrap="wrap" direction="row">
+        <Box style={{ flex: '1 1 calc(50% - 6px)', minWidth: '140px' }}>
+          <Text as="label" size="1" color="gray" style={{ display: 'block', marginBottom: '2px' }}>
             ステータス
           </Text>
           <Select.Root value={status} onValueChange={onStatusChange}>
@@ -54,8 +54,8 @@ export default function TodoFilters({
             </Select.Content>
           </Select.Root>
         </Box>
-        <Box style={{ flex: '1 1 40%', minWidth: 0 }}>
-          <Text as="label" size="1" color="gray">
+        <Box style={{ flex: '1 1 calc(50% - 6px)', minWidth: '140px' }}>
+          <Text as="label" size="1" color="gray" style={{ display: 'block', marginBottom: '2px' }}>
             優先度
           </Text>
           <Select.Root value={priority} onValueChange={onPriorityChange}>
@@ -68,8 +68,8 @@ export default function TodoFilters({
             </Select.Content>
           </Select.Root>
         </Box>
-        <Box style={{ flex: '1 1 40%', minWidth: 0 }}>
-          <Text as="label" size="1" color="gray">
+        <Box style={{ flex: '1 1 calc(50% - 6px)', minWidth: '140px' }}>
+          <Text as="label" size="1" color="gray" style={{ display: 'block', marginBottom: '2px' }}>
             ソート
           </Text>
           <Select.Root value={sort} onValueChange={onSortChange}>
@@ -81,8 +81,8 @@ export default function TodoFilters({
             </Select.Content>
           </Select.Root>
         </Box>
-        <Box style={{ flex: '1 1 40%', minWidth: 0 }}>
-          <Text as="label" size="1" color="gray">
+        <Box style={{ flex: '1 1 calc(50% - 6px)', minWidth: '140px' }}>
+          <Text as="label" size="1" color="gray" style={{ display: 'block', marginBottom: '2px' }}>
             順序
           </Text>
           <Select.Root value={order} onValueChange={onOrderChange}>
