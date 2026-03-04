@@ -1,6 +1,6 @@
 'use client';
 
-import { todoFormSchema, TodoFormValues } from '@/schemas/todo';
+import { todoFormSchema, TodoFormInput, TodoFormOutput } from '@/schemas/todo';
 import { Todo } from '@/types/todo';
 import { zodResolver } from '@hookform/resolvers/zod';
 import {
@@ -13,13 +13,14 @@ import {
   TextArea,
   TextField,
 } from '@radix-ui/themes';
+import { DateTime } from 'luxon';
 import { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 
 interface TodoFormDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  onSubmit: (values: TodoFormValues) => Promise<void>;
+  onSubmit: (values: TodoFormOutput) => Promise<void>;
   todo?: Todo | null;
 }
 
@@ -29,7 +30,7 @@ const defaultValues = {
   dueDate: '',
   status: 'pending',
   priority: 'medium',
-} as const satisfies TodoFormValues;
+} as const satisfies TodoFormOutput;
 
 export default function TodoFormDialog({
   open,
@@ -46,7 +47,7 @@ export default function TodoFormDialog({
     setValue,
     watch,
     formState: { errors, isSubmitting },
-  } = useForm<TodoFormValues>({
+  } = useForm<TodoFormInput, any, TodoFormOutput>({
     resolver: zodResolver(todoFormSchema),
     defaultValues,
   });
@@ -57,7 +58,11 @@ export default function TodoFormDialog({
       reset({
         title: todo.title,
         description: todo.description ?? '',
-        dueDate: todo.dueDate ? todo.dueDate.slice(0, 16) : '',
+        dueDate: todo.dueDate
+          ? DateTime.fromISO(todo.dueDate)
+              .toLocal()
+              .toFormat("yyyy-MM-dd'T'HH:mm")
+          : '',
         status: todo.status,
         priority: todo.priority,
       });
@@ -66,7 +71,7 @@ export default function TodoFormDialog({
     }
   }, [open, isEdit, todo, reset]);
 
-  const handleFormSubmit = async (values: TodoFormValues): Promise<void> => {
+  const handleFormSubmit = async (values: TodoFormOutput): Promise<void> => {
     await onSubmit(values);
     onOpenChange(false);
   };

@@ -8,7 +8,7 @@ export interface Todo {
   id: string;
   title: string;
   description: string | null;
-  dueDate: string | null;
+  dueDate?: string | null | undefined;
   status: TodoStatus;
   priority: TodoPriority;
   createdAt: string;

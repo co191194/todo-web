@@ -10,7 +10,7 @@ import { getMessage, Message } from '@/constants/message';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/contexts/ToastContext';
 import apiClient from '@/lib/api-client';
-import { TodoFormValues } from '@/schemas/todo';
+import { TodoFormOutput } from '@/schemas/todo';
 import {
   TodoSortValues,
   TodoPriority,
@@ -79,7 +79,7 @@ export default function Home() {
   }, [isLoading, fetchTodos]);
 
   // 作成
-  const handleCreate = async (values: TodoFormValues) => {
+  const handleCreate = async (values: TodoFormOutput) => {
     try {
       await apiClient.post(API_URI.TODOS, {
         title: values.title,
@@ -98,7 +98,7 @@ export default function Home() {
   };
 
   // 更新
-  const handleUpdate = async (values: TodoFormValues) => {
+  const handleUpdate = async (values: TodoFormOutput) => {
     if (!editingTodo) return;
     try {
       await apiClient.put(API_URI.TODO_BY_ID(editingTodo.id), {
